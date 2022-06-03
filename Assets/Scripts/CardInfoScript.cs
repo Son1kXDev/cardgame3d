@@ -8,30 +8,55 @@ public class CardInfoScript : MonoBehaviour
 {
     public Card SelfCard;
 
+    public bool isPlayer;
+
     [SerializeField] private Image logo;
     [SerializeField] private Image hiden;
-    [SerializeField] private TextMeshProUGUI lable, attack, defence;
-
+    [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
     [SerializeField] private MeshRenderer cardMaterial;
 
     public void HideCardInfo(Card card)
     {
         SelfCard = card;
         hiden.enabled = true;
+        isPlayer = false;
+        manacost.text = "";
     }
 
-    public void ShowCardInfo(Card card)
+    public void ShowCardInfo(Card card, bool IsPlayer)
     {
+        isPlayer = IsPlayer;
+
         SelfCard = card;
         logo.sprite = card.Logo;
         logo.preserveAspect = true;
         lable.text = card.Name;
-        attack.text = card.Attack.ToString();
-        defence.text = card.Defense.ToString();
+        RefreshData();
         hiden.enabled = false;
     }
 
-    public void HighLightCardEnable() => cardMaterial.material.color = Color.green;
+    public void RefreshData()
+    {
+        attack.text = SelfCard.Attack.ToString();
+        defence.text = SelfCard.Defense.ToString();
+        manacost.text = SelfCard.Manacost.ToString();
+    }
 
-    public void HighLightCardDisable() => cardMaterial.material.color = Color.white;
+    public void ShowDamage(Color color)
+    {
+        StartCoroutine(visualizeDamage(color));
+    }
+
+    private IEnumerator visualizeDamage(Color color)
+    {
+        cardMaterial.material.color = color;
+        yield return new WaitForSeconds(1);
+        cardMaterial.material.color = Color.white;
+    }
+
+    public void HighLightCardEnable()
+    { if (cardMaterial) cardMaterial.material.color = Color.green; }
+
+    public void HighLightCardDisable()
+    { if (cardMaterial) cardMaterial.material.color = Color.white; }
 }
