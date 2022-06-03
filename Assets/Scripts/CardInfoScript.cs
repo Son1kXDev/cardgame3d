@@ -6,22 +6,24 @@ using TMPro;
 
 public class CardInfoScript : MonoBehaviour
 {
-    public Card SelfCard;
-    public Image Logo;
-    public TextMeshProUGUI Lable;
+    [SerializeField] private Image logo;
+    [SerializeField] private Image hiden;
+    [SerializeField] private TextMeshProUGUI lable;
+
+    private Card selfCard;
 
     public void HideCardInfo(Card card)
     {
-        SelfCard = card;
-        Logo.sprite = null;
-        Lable.text = "";
+        selfCard = card;
+        hiden.enabled = true;
     }
 
     public void ShowCardInfo(Card card)
     {
-        SelfCard = card;
-        Logo.sprite = card.Logo;
-        Logo.preserveAspect = true;
-        Lable.text = card.Name;
+        selfCard = card;
+        logo.sprite = card.Logo;
+        logo.preserveAspect = true;
+        lable.text = card.Name;
+        hiden.enabled = false;
     }
 }
