@@ -183,7 +183,7 @@ MonoBehaviour:
   enemy: {fileID: 1967347547}
   playerField: {fileID: 1757264107}
   enemyField: {fileID: 1058221741}
-  cardPrefab: {fileID: 3367294664634066941, guid: a2879bccadf1ff549b28985998a1a131, type: 3}
+  cardPrefab: {fileID: 3367294664634066941, guid: da211b1995726264c86b0043ed09dec0, type: 3}
   turnTimeText: {fileID: 96309698}
   endTurnButton: {fileID: 669136734}
   PlayerHandCard: []
