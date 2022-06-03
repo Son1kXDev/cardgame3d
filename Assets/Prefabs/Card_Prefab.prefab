@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultParent: {fileID: 0}
+  defaultTempCardParent: {fileID: 0}
   canvas: {fileID: 0}
 --- !u!225 &6616682576267269878
 CanvasGroup:
