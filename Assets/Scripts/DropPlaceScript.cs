@@ -31,7 +31,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (eventData.pointerDrag == null || type == FiledType.ENEMY_FIELD || type == FiledType.ENEMY_HAND) return;
+        if (eventData.pointerDrag == null || type == FiledType.ENEMY_FIELD || type == FiledType.ENEMY_HAND || type == FiledType.SELF_HAND) return;
 
         CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
         if (card)
