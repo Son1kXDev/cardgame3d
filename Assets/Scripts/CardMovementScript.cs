@@ -24,7 +24,7 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         defaultParent = defaultTempCardParent = transform.parent;
 
-        isDraggable = defaultParent.GetComponent<DropPlaceScript>().type == FiledType.SELF_HAND;
+        isDraggable = defaultParent.GetComponent<DropPlaceScript>().type == FiledType.SELF_HAND && GameManager.manager.isPlayerTurn;
 
         if (!isDraggable) return;
 

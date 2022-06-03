@@ -32,16 +32,42 @@ public class Game
 
 public class GameManager : MonoBehaviour
 {
-    public Game currentGame;
-    public Transform player, enemy;
-    public GameObject cardPrefab;
+    public static GameManager manager;
+
+    public bool isPlayerTurn
+    {
+        get
+        {
+            return turn % 2 == 0;
+        }
+    }
+
+    [SerializeField, Header("Позиции рук")]
+    private Transform player;[SerializeField] private Transform enemy;
+
+    [SerializeField, Header("Префаб карты")] private GameObject cardPrefab;
+    [SerializeField, Header("Таймер")] private TextMeshProUGUI turnTimeText;
+    [SerializeField] private Button endTurnButton;
+
+    private Game currentGame;
+    private int turn, turnTime = 30;
+
+    private void Awake()
+    {
+        if (manager != null) Destroy(this);
+        else manager = this;
+    }
 
     private void Start()
     {
+        turn = 0;
+
         currentGame = new Game();
 
         GiveHandCard(currentGame.EnemyDeck, enemy);
         GiveHandCard(currentGame.PlayerDeck, player);
+
+        StartCoroutine(TurnFunc());
     }
 
     private void GiveHandCard(List<Card> deck, Transform hand)
@@ -67,5 +93,45 @@ public class GameManager : MonoBehaviour
         else curentCard.GetComponent<CardInfoScript>().ShowCardInfo(card);
 
         deck.RemoveAt(0);
+    }
+
+    private IEnumerator TurnFunc()
+    {
+        turnTime = 30;
+        turnTimeText.text = turnTime.ToString();
+
+        if (isPlayerTurn)
+        {
+            while (turnTime-- > 0)
+            {
+                turnTimeText.text = turnTime.ToString();
+                yield return new WaitForSeconds(1);
+            }
+        }
+        else
+        {
+            while (turnTime-- > 27)
+            {
+                turnTimeText.text = turnTime.ToString();
+                yield return new WaitForSeconds(1);
+            }
+        }
+        ChangeTurn();
+    }
+
+    public void ChangeTurn()
+    {
+        StopAllCoroutines();
+        turn++;
+        endTurnButton.interactable = isPlayerTurn;
+
+        if (isPlayerTurn) GiveNewCards();
+        StartCoroutine(TurnFunc());
+    }
+
+    private void GiveNewCards()
+    {
+        GiveCardToHand(currentGame.EnemyDeck, enemy);
+        GiveCardToHand(currentGame.PlayerDeck, player);
     }
 }
