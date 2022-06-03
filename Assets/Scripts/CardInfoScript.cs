@@ -12,6 +12,8 @@ public class CardInfoScript : MonoBehaviour
     [SerializeField] private Image hiden;
     [SerializeField] private TextMeshProUGUI lable, attack, defence;
 
+    [SerializeField] private MeshRenderer cardMaterial;
+
     public void HideCardInfo(Card card)
     {
         SelfCard = card;
@@ -28,4 +30,8 @@ public class CardInfoScript : MonoBehaviour
         defence.text = card.Defense.ToString();
         hiden.enabled = false;
     }
+
+    public void HighLightCardEnable() => cardMaterial.material.color = Color.green;
+
+    public void HighLightCardDisable() => cardMaterial.material.color = Color.white;
 }

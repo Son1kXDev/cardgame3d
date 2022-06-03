@@ -18,10 +18,9 @@ public struct Card
         CanAttack = false;
     }
 
-    private void ChangeAttackState(bool canAttack)
+    public void ChangeAttackState(bool canAttack)
     {
         CanAttack = canAttack;
-        Debug.Log(" ");
     }
 }
 

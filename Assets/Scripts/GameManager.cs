@@ -110,11 +110,15 @@ public class GameManager : MonoBehaviour
         turnTime = 30;
         turnTimeText.text = turnTime.ToString();
 
+        foreach (var card in PlayerFieldCard)
+            card.HighLightCardDisable();
+
         if (isPlayerTurn)
         {
             foreach (var card in PlayerFieldCard)
             {
-                //card.SelfCard.
+                card.SelfCard.ChangeAttackState(true);
+                card.HighLightCardEnable();
             }
 
             while (turnTime-- > 0)
@@ -125,6 +129,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            foreach (var card in PlayerFieldCard)
+            {
+                card.SelfCard.ChangeAttackState(true);
+            }
+
             while (turnTime-- > 27)
             {
                 turnTimeText.text = turnTime.ToString();

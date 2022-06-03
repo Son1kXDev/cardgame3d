@@ -458,6 +458,7 @@ MonoBehaviour:
   lable: {fileID: 6569664234770749875}
   attack: {fileID: 8261052044201874819}
   defence: {fileID: 6048203339402805674}
+  cardMaterial: {fileID: 4686719906988325762}
 --- !u!1 &3528481632241016800
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,6 +790,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 03eca017931d79041a022de3e292e9a1, type: 2}
     - target: {fileID: 919132149155446097, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
       propertyPath: m_Name
       value: Card_Model
@@ -798,5 +803,10 @@ PrefabInstance:
 --- !u!4 &5855170104963465453 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
+  m_PrefabInstance: {fileID: 6254100535958890246}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4686719906988325762 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
   m_PrefabInstance: {fileID: 6254100535958890246}
   m_PrefabAsset: {fileID: 0}
