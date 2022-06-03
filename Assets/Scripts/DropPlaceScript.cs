@@ -3,11 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public enum FiledType
+{
+    SELF_HAND,
+    SELF_FIELD,
+    ENEMY_HAND,
+    ENEMY_FIELD
+}
+
 public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
+    public FiledType type;
+
     public void OnDrop(PointerEventData eventData)
     {
-        CardScript card = eventData.pointerDrag.GetComponent<CardScript>();
+        if (type != FiledType.SELF_FIELD) return;
+
+        CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
 
         if (card)
             card.defaultParent = transform;
@@ -15,9 +27,9 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (eventData.pointerDrag == null) return;
+        if (eventData.pointerDrag == null || type == FiledType.ENEMY_FIELD || type == FiledType.ENEMY_HAND) return;
 
-        CardScript card = eventData.pointerDrag.GetComponent<CardScript>();
+        CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
         if (card)
             card.defaultTempCardParent = transform;
     }
@@ -26,7 +38,7 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler
     {
         if (eventData.pointerDrag == null) return;
 
-        CardScript card = eventData.pointerDrag.GetComponent<CardScript>();
+        CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
         if (card && card.defaultTempCardParent == transform)
             card.defaultTempCardParent = card.defaultParent;
     }

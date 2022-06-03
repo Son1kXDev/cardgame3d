@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Transform defaultParent, defaultTempCardParent;
+    public bool isDraggable;
 
     [SerializeField] private Canvas canvas;
 
@@ -23,8 +24,14 @@ public class CardScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         defaultParent = defaultTempCardParent = transform.parent;
 
+        isDraggable = defaultParent.GetComponent<DropPlaceScript>().type == FiledType.SELF_HAND;
+
+        if (!isDraggable) return;
+
         tempCard.transform.SetParent(defaultParent);
         tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -50);
 
         transform.SetParent(defaultParent.parent);
         GetComponent<CanvasGroup>().blocksRaycasts = false;
@@ -32,6 +39,8 @@ public class CardScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!isDraggable) return;
+
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
 
         if (tempCard.transform.parent != defaultTempCardParent) tempCard.transform.SetParent(defaultTempCardParent);
@@ -41,10 +50,14 @@ public class CardScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!isDraggable) return;
+
         transform.SetParent(defaultParent);
         GetComponent<CanvasGroup>().blocksRaycasts = true;
 
         transform.SetSiblingIndex(tempCard.transform.GetSiblingIndex());
+
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
 
         tempCard.transform.SetParent(canvas.transform);
         tempCard.transform.localPosition = new Vector3(2500, 0);
