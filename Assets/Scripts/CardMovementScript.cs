@@ -46,7 +46,7 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         if (tempCard.transform.parent != defaultTempCardParent) tempCard.transform.SetParent(defaultTempCardParent);
 
-        CheckPossition();
+        if (defaultParent.GetComponent<DropPlaceScript>().type != FiledType.SELF_FIELD) CheckPossition();
     }
 
     public void OnEndDrag(PointerEventData eventData)
