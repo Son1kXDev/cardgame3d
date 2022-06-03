@@ -21,6 +21,7 @@ public struct Card
     private void ChangeAttackState(bool canAttack)
     {
         CanAttack = canAttack;
+        Debug.Log(" ");
     }
 }
 

@@ -112,6 +112,11 @@ public class GameManager : MonoBehaviour
 
         if (isPlayerTurn)
         {
+            foreach (var card in PlayerFieldCard)
+            {
+                //card.SelfCard.
+            }
+
             while (turnTime-- > 0)
             {
                 turnTimeText.text = turnTime.ToString();
