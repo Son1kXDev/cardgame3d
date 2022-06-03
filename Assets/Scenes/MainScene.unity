@@ -181,9 +181,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1238501054}
   enemy: {fileID: 1967347547}
+  playerField: {fileID: 1757264107}
+  enemyField: {fileID: 1058221741}
   cardPrefab: {fileID: 3367294664634066941, guid: a2879bccadf1ff549b28985998a1a131, type: 3}
   turnTimeText: {fileID: 96309698}
   endTurnButton: {fileID: 669136734}
+  PlayerHandCard: []
+  EnemyHandCard: []
+  PlayerFieldCard: []
+  EnemyFieldCard: []
 --- !u!1 &2318031
 GameObject:
   m_ObjectHideFlags: 0
@@ -1112,7 +1118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1523,7 +1529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -21,8 +21,12 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler
 
         CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
 
-        if (card)
+        if (card && GameManager.manager.PlayerFieldCard.Count <= 5)
+        {
+            GameManager.manager.PlayerHandCard.Remove(card.GetComponent<CardInfoScript>());
+            GameManager.manager.PlayerFieldCard.Add(card.GetComponent<CardInfoScript>());
             card.defaultParent = transform;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
