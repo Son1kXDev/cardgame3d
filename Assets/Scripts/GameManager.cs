@@ -200,14 +200,24 @@ public class GameManager : MonoBehaviour
 
         foreach (var active in EnemyFieldCard.FindAll(x => x.SelfCard.CanAttack))
         {
-            if (PlayerFieldCard.Count == 0) { return; }
+            if (Random.Range(0, 2) == 0 && PlayerFieldCard.Count > 0)
+            {
+                var enemy = PlayerFieldCard[Random.Range(0, PlayerFieldCard.Count)];
 
-            var enemy = PlayerFieldCard[Random.Range(0, PlayerFieldCard.Count)];
-            enemy.ShowDamage(Color.red);
-            active.ShowDamage(Color.blue);
+                enemy.ShowDamage(Color.red);
+                active.ShowDamage(Color.blue);
 
-            active.SelfCard.ChangeAttackState(false);
-            CardsFight(enemy, active);
+                active.SelfCard.ChangeAttackState(false);
+                CardsFight(enemy, active);
+            }
+            else
+            {
+                Debug.Log("Attaced hero");
+
+                active.ShowDamage(Color.blue);
+                active.SelfCard.ChangeAttackState(false);
+                DamageHero(active, false);
+            }
         }
     }
 
@@ -263,16 +273,57 @@ public class GameManager : MonoBehaviour
 
     public void DamageHero(CardInfoScript card, bool isEnemyAttacked)
     {
-        if (isEnemyAttacked) EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
-        else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
-
+        Debug.Log("Start attacked");
+        if (isEnemyAttacked)
+        {
+            foreach (var item in EnemyFieldCard)
+            {
+                if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                {
+                    CardsFight(card, item);
+                    break;
+                }
+            }
+            EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
+        }
+        else
+        {
+            foreach (var item in PlayerFieldCard)
+            {
+                Debug.Log("Check for build");
+                if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                {
+                    Debug.Log("Find build");
+                    CardsFight(card, item);
+                    break;
+                }
+            }
+            Debug.Log("Don't find build. Attack player");
+            PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+        }
+        Debug.Log("End of attack");
         card.HighLightCardDisable();
         ShowHP();
+        CheckForResult();
     }
 
     private void ShowHP()
     {
         playerHPText.text = PlayerHP.ToString();
         enemyHPText.text = EnemyHP.ToString();
+        Debug.Log("Show hp");
+    }
+
+    private void CheckForResult()
+    {
+        Debug.Log("Checkforresult");
+        if (EnemyHP == 0)
+        {
+            StopAllCoroutines();
+        }
+        else if (PlayerHP == 0)
+        {
+            StopAllCoroutines();
+        }
     }
 }

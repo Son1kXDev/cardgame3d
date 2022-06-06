@@ -28,7 +28,16 @@ public class CardInfoScript : MonoBehaviour
         isPlayer = IsPlayer;
 
         SelfCard = card;
-        logo.sprite = card.Logo;
+        switch (IsPlayer)
+        {
+            case true:
+                logo.sprite = Resources.Load<Sprite>(card.logoPlayer);
+                break;
+
+            case false:
+                logo.sprite = Resources.Load<Sprite>(card.logoEnemy);
+                break;
+        }
         logo.preserveAspect = true;
         lable.text = card.Name;
         RefreshData();
