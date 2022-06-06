@@ -260,6 +260,11 @@ public class GameManager : MonoBehaviour
         else { enemyCard.RefreshData(); }
     }
 
+    public void CardsHeal(CardInfoScript healerCard, CardInfoScript healedCard)
+    {
+        healedCard.SelfCard.GetHeal(healerCard.SelfCard.Heal);
+    }
+
     private void DestroyCard(CardInfoScript card)
     {
         card.GetComponent<CardMovementScript>().OnEndDrag(null);
@@ -273,39 +278,55 @@ public class GameManager : MonoBehaviour
 
     public void DamageHero(CardInfoScript card, bool isEnemyAttacked)
     {
-        Debug.Log("Start attacked");
-        if (isEnemyAttacked)
+        if (CheckIfBuilld(isEnemyAttacked))
         {
-            foreach (var item in EnemyFieldCard)
-            {
-                if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
-                {
-                    CardsFight(card, item);
-                    break;
-                }
-            }
-            EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
+            Debug.Log("Find build");
+            card.ShowDamage(Color.blue);
+            tempBuild.ShowDamage(Color.red);
+            CardsFight(card, tempBuild);
         }
         else
         {
-            foreach (var item in PlayerFieldCard)
-            {
-                Debug.Log("Check for build");
-                if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
-                {
-                    Debug.Log("Find build");
-                    CardsFight(card, item);
-                    break;
-                }
-            }
-            Debug.Log("Don't find build. Attack player");
-            PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+            if (isEnemyAttacked) EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
+            else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
         }
+
         Debug.Log("End of attack");
         card.HighLightCardDisable();
         ShowHP();
         CheckForResult();
     }
+
+    private bool CheckIfBuilld(bool isEnemyAttacked)
+    {
+        switch (isEnemyAttacked)
+        {
+            case true:
+                foreach (var item in EnemyFieldCard)
+                {
+                    if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    {
+                        tempBuild = item;
+                        return true;
+                    }
+                }
+                break;
+
+            case false:
+                foreach (var item in PlayerFieldCard)
+                {
+                    if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    {
+                        tempBuild = item;
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
+    }
+
+    private CardInfoScript tempBuild;
 
     private void ShowHP()
     {
