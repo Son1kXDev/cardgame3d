@@ -17,7 +17,7 @@ public class Game
     private List<Card> GiveDeckCard()
     {
         List<Card> list = new List<Card>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             list.Add(CardManagerList.AllCards[Random.Range(0, CardManagerList.AllCards.Count)]);
         }
@@ -36,6 +36,11 @@ public class GameManager : MonoBehaviour
             return turn % 2 == 0;
         }
     }
+
+    [Header("Жизни")]
+    [SerializeField] private int PlayerHP;
+    [SerializeField] private int EnemyHP;
+    [SerializeField] private TextMeshProUGUI playerHPText, enemyHPText;
 
     [Header("Позиции рук")]
     [SerializeField] private Transform player;
@@ -72,7 +77,10 @@ public class GameManager : MonoBehaviour
         turn = 0;
         currentGame = new Game();
 
+        PlayerHP = EnemyHP = 30;
+
         ShowMana();
+        ShowHP();
         GiveHandCard(currentGame.EnemyDeck, enemy);
         GiveHandCard(currentGame.PlayerDeck, player);
 
@@ -108,6 +116,22 @@ public class GameManager : MonoBehaviour
         }
 
         deck.RemoveAt(0);
+    }
+
+    public void ChangeTurn()
+    {
+        StopAllCoroutines();
+        turn++;
+        endTurnButton.interactable = isPlayerTurn;
+
+        if (isPlayerTurn)
+        {
+            GiveNewCards();
+            playerMana += 10;
+            enemyMana += 10;
+            ShowMana();
+        }
+        StartCoroutine(TurnFunc());
     }
 
     private IEnumerator TurnFunc()
@@ -187,22 +211,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ChangeTurn()
-    {
-        StopAllCoroutines();
-        turn++;
-        endTurnButton.interactable = isPlayerTurn;
-
-        if (isPlayerTurn)
-        {
-            GiveNewCards();
-            playerMana += 10;
-            enemyMana += 10;
-            ShowMana();
-        }
-        StartCoroutine(TurnFunc());
-    }
-
     public void ReduceMana(bool isPlayer, int manacost)
     {
         switch (isPlayer)
@@ -251,5 +259,20 @@ public class GameManager : MonoBehaviour
         if (PlayerFieldCard.Exists(x => x == card)) { PlayerFieldCard.Remove(card); }
 
         Destroy(card.gameObject);
+    }
+
+    public void DamageHero(CardInfoScript card, bool isEnemyAttacked)
+    {
+        if (isEnemyAttacked) EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
+        else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+
+        card.HighLightCardDisable();
+        ShowHP();
+    }
+
+    private void ShowHP()
+    {
+        playerHPText.text = PlayerHP.ToString();
+        enemyHPText.text = EnemyHP.ToString();
     }
 }
