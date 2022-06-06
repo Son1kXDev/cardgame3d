@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int PlayerHP;
     [SerializeField] private int EnemyHP;
     [SerializeField] private TextMeshProUGUI playerHPText, enemyHPText;
+    [SerializeField] private TextMeshProUGUI resultsText;
+    [SerializeField] private GameObject resultsPanel;
 
     [Header("Позиции рук")]
     [SerializeField] private Transform player;
@@ -148,6 +150,11 @@ public class GameManager : MonoBehaviour
             {
                 card.SelfCard.ChangeAttackState(true);
                 card.HighLightCardEnable();
+                if (card.SelfCard.cardType == CardType.Build)
+                {
+                    card.SelfCard.ChangeAttackState(false);
+                    card.HighLightCardDisable();
+                }
             }
 
             while (turnTime-- > 0)
@@ -161,6 +168,11 @@ public class GameManager : MonoBehaviour
             foreach (var card in EnemyFieldCard)
             {
                 card.SelfCard.ChangeAttackState(true);
+                if (card.SelfCard.cardType == CardType.Build)
+                {
+                    card.SelfCard.ChangeAttackState(false);
+                    card.HighLightCardDisable();
+                }
             }
 
             while (turnTime-- > 27)
@@ -341,10 +353,16 @@ public class GameManager : MonoBehaviour
         if (EnemyHP == 0)
         {
             StopAllCoroutines();
+            resultsPanel.SetActive(true);
+            resultsText.text = "Победа";
+            resultsText.color = Color.green;
         }
         else if (PlayerHP == 0)
         {
             StopAllCoroutines();
+            resultsPanel.SetActive(true);
+            resultsText.text = "Поражение";
+            resultsText.color = Color.red;
         }
     }
 }

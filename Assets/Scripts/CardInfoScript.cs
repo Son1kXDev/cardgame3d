@@ -11,14 +11,14 @@ public class CardInfoScript : MonoBehaviour
     public bool isPlayer;
 
     [SerializeField] private Image logo;
-    [SerializeField] private Image hiden;
+    [SerializeField] private GameObject hiden;
     [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
     [SerializeField] private MeshRenderer cardMaterial;
 
     public void HideCardInfo(Card card)
     {
         SelfCard = card;
-        hiden.enabled = true;
+        hiden.SetActive(true);
         isPlayer = false;
         manacost.text = "";
     }
@@ -41,7 +41,7 @@ public class CardInfoScript : MonoBehaviour
         logo.preserveAspect = true;
         lable.text = card.Name;
         RefreshData();
-        hiden.enabled = false;
+        hiden.SetActive(false);
     }
 
     public void RefreshData()
