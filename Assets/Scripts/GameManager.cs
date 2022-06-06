@@ -148,10 +148,12 @@ public class GameManager : MonoBehaviour
         {
             foreach (var card in PlayerFieldCard)
             {
+                Debug.Log("set card to attack");
                 card.SelfCard.ChangeAttackState(true);
                 card.HighLightCardEnable();
                 if (card.SelfCard.cardType == CardType.Build)
                 {
+                    Debug.Log("disable build card");
                     card.SelfCard.ChangeAttackState(false);
                     card.HighLightCardDisable();
                 }

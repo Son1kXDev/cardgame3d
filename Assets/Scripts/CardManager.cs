@@ -71,7 +71,7 @@ public class CardManager : MonoBehaviour
         CardManagerList.AllCards.Add(new Card("Танк", "Sprite/Cards/tank_elf", "Sprite/Cards/tank_ork", 7, 0, 15, 15, CardType.Attack));
         CardManagerList.AllCards.Add(new Card("Целитель", "Sprite/Cards/heal_elf", "Sprite/Cards/heal_ork", 1, 5, 3, 5, CardType.Heal));
         CardManagerList.AllCards.Add(new Card("Маг", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
-        CardManagerList.AllCards.Add(new Card("Катапульта", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.Build));
-        CardManagerList.AllCards.Add(new Card("Башня", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.AttackBuild));
+        CardManagerList.AllCards.Add(new Card("Катапульта", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
+        CardManagerList.AllCards.Add(new Card("Башня", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
     }
 }
