@@ -10,6 +10,8 @@ public class CardInfoScript : MonoBehaviour
 
     public bool isPlayer;
 
+    public GameObject CardModel;
+
     [SerializeField] private Image logo;
     [SerializeField] private GameObject hiden;
     [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
@@ -59,7 +61,7 @@ public class CardInfoScript : MonoBehaviour
     private IEnumerator visualizeDamage(Color color)
     {
         cardMaterial.material.color = color;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
         cardMaterial.material.color = Color.white;
     }
 

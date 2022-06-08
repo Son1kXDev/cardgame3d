@@ -13,14 +13,13 @@ public class HealedCard : MonoBehaviour, IDropHandler
 
         if (card && card.SelfCard.CanAttack &&
             card.SelfCard.cardType == CardType.Heal
-            && transform.parent == GameManager.manager.playerField
+            && transform.parent == CardManager.cardManager.playerField
             && GetComponent<CardInfoScript>().SelfCard.cardType != CardType.Build
             && GetComponent<CardInfoScript>().SelfCard.cardType != CardType.AttackBuild)
         {
             card.SelfCard.ChangeAttackState(false);
             if (card.isPlayer) card.HighLightCardDisable();
-            GameManager.manager.CardsHeal(card, GetComponent<CardInfoScript>());
-            GetComponent<CardInfoScript>().RefreshData();
+            CardManager.cardManager.CardsHeal(card, GetComponent<CardInfoScript>());
         }
     }
 }

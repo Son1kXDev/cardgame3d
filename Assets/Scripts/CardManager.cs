@@ -54,18 +54,31 @@ public static class CardManagerList
     public static List<Card> AllCards = new List<Card>();
 }
 
-//лучник - Вулмер
-//мечник - Кларенс
-//танк - Трембор
-//хилер - Целиндра
-//маг - Пэрус
-//катапульта
-//стена (башня)
-
 public class CardManager : MonoBehaviour
 {
+    public static CardManager cardManager;
+
+    [Header("Позиции рук")]
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform enemy;
+    public Transform playerField;
+    public Transform enemyField;
+
+    [Header("Префаб карты"), SerializeField] private GameObject cardPrefab;
+
+    [Header("Карты")]
+    public List<CardInfoScript> PlayerHandCard = new List<CardInfoScript>();
+    public List<CardInfoScript> EnemyHandCard = new List<CardInfoScript>();
+    public List<CardInfoScript> PlayerFieldCard = new List<CardInfoScript>();
+    public List<CardInfoScript> EnemyFieldCard = new List<CardInfoScript>();
+
+    private Game currentGame;
+
     private void Awake()
     {
+        if (cardManager != null) Destroy(this);
+        else cardManager = this;
+
         CardManagerList.AllCards.Add(new Card("Лучник", "Sprite/Cards/archer_elf", "Sprite/Cards/archer_ork", 3, 0, 3, 2, CardType.Attack));
         CardManagerList.AllCards.Add(new Card("Мечник", "Sprite/Cards/melee_elf", "Sprite/Cards/melee_ork", 5, 0, 5, 4, CardType.Attack));
         CardManagerList.AllCards.Add(new Card("Танк", "Sprite/Cards/tank_elf", "Sprite/Cards/tank_ork", 7, 0, 15, 15, CardType.Attack));
@@ -73,5 +86,113 @@ public class CardManager : MonoBehaviour
         CardManagerList.AllCards.Add(new Card("Маг", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
         CardManagerList.AllCards.Add(new Card("Катапульта", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
         CardManagerList.AllCards.Add(new Card("Башня", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
+    }
+
+    private void Start()
+    {
+        currentGame = new Game();
+
+        GiveHandCard(currentGame.EnemyDeck, enemy);
+        GiveHandCard(currentGame.PlayerDeck, player);
+    }
+
+    public void GiveHandCard(List<Card> deck, Transform hand)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            GiveCardToHand(deck, hand);
+        }
+    }
+
+    public void GiveNewCards()
+    {
+        GiveCardToHand(currentGame.EnemyDeck, enemy);
+        GiveCardToHand(currentGame.PlayerDeck, player);
+    }
+
+    private void GiveCardToHand(List<Card> deck, Transform hand)
+    {
+        if (deck.Count == 0) return;
+
+        Card card = deck[0];
+        GameObject curentCard = Instantiate(cardPrefab, hand, false);
+
+        if (hand == enemy)
+        {
+            curentCard.GetComponent<CardInfoScript>().HideCardInfo(card);
+            curentCard.gameObject.transform.Rotate(new Vector3(0, 0, 180));
+            EnemyHandCard.Add(curentCard.GetComponent<CardInfoScript>());
+        }
+        else
+        {
+            curentCard.GetComponent<CardInfoScript>().ShowCardInfo(card, true);
+            PlayerHandCard.Add(curentCard.GetComponent<CardInfoScript>());
+            curentCard.GetComponent<AttacedCard>().enabled = false;
+        }
+
+        deck.RemoveAt(0);
+    }
+
+    public void CardsHeal(CardInfoScript healerCard, CardInfoScript healedCard)
+    {
+        healedCard.SelfCard.GetHeal(healerCard.SelfCard.Heal);
+        healedCard.RefreshData();
+    }
+
+    [HideInInspector] public List<CardInfoScript> CardsToDestroy = new List<CardInfoScript>();
+
+    public void CardsFight(CardInfoScript playerCard, CardInfoScript enemyCard)
+    {
+        playerCard.SelfCard.GetDamage(enemyCard.SelfCard.Attack);
+        enemyCard.SelfCard.GetDamage(playerCard.SelfCard.Attack);
+
+        if (!playerCard.SelfCard.IsAlive) { CardsToDestroy.Add(playerCard); playerCard.CardModel.SetActive(false); }
+        else { playerCard.RefreshData(); }
+
+        if (!enemyCard.SelfCard.IsAlive) { CardManager.cardManager.DestroyCard(enemyCard); }
+        else { enemyCard.RefreshData(); }
+    }
+
+    public void DestroyCard(CardInfoScript card)
+    {
+        if (card == null) return;
+        card.GetComponent<CardMovementScript>().OnEndDrag(null);
+
+        if (EnemyFieldCard.Exists(x => x == card)) { EnemyFieldCard.Remove(card); }
+
+        if (PlayerFieldCard.Exists(x => x == card)) { PlayerFieldCard.Remove(card); }
+
+        Destroy(card.gameObject);
+    }
+
+    [HideInInspector] public CardInfoScript tempBuild;
+
+    public bool CheckIfBuildCard(bool isEnemyAttacked)
+    {
+        switch (isEnemyAttacked)
+        {
+            case true:
+                foreach (var item in EnemyFieldCard)
+                {
+                    if (item.GetComponent<CardInfoScript>() != null && item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    {
+                        tempBuild = item;
+                        return true;
+                    }
+                }
+                break;
+
+            case false:
+                foreach (var item in PlayerFieldCard)
+                {
+                    if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    {
+                        tempBuild = item;
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
     }
 }

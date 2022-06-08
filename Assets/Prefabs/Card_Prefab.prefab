@@ -585,6 +585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
+  CardModel: {fileID: 6488119832283044439}
   logo: {fileID: 8875167423269077256}
   hiden: {fileID: 2645027385049728858}
   lable: {fileID: 6569664234770749875}
@@ -1193,5 +1194,10 @@ MeshRenderer:
 --- !u!4 &5855170104963465453 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
+  m_PrefabInstance: {fileID: 6254100535958890246}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6488119832283044439 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
   m_PrefabInstance: {fileID: 6254100535958890246}
   m_PrefabAsset: {fileID: 0}
