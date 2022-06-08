@@ -17,7 +17,7 @@ public class Game
     private List<Card> GiveDeckCard()
     {
         List<Card> list = new List<Card>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             list.Add(CardManagerList.AllCards[Random.Range(0, CardManagerList.AllCards.Count)]);
         }
@@ -37,29 +37,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    [Header("Позиции рук")]
-    [SerializeField] private Transform player;
-    [SerializeField] private Transform enemy;
-    public Transform playerField;
-    public Transform enemyField;
-
-    [Header("Префаб карты"), SerializeField] private GameObject cardPrefab;
+    [Header("Жизни")]
+    [SerializeField] private int PlayerHP;
+    [SerializeField] private int EnemyHP;
+    [SerializeField] private TextMeshProUGUI playerHPText, enemyHPText;
+    [SerializeField] private TextMeshProUGUI resultsText;
+    [SerializeField] private GameObject resultsPanel;
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI turnTimeText;
-    [SerializeField] private TextMeshProUGUI playerManaText, enemyManaText;
     [SerializeField] private Button endTurnButton;
 
-    [Header("Карты")]
-    public List<CardInfoScript> PlayerHandCard = new List<CardInfoScript>();
-    public List<CardInfoScript> EnemyHandCard = new List<CardInfoScript>();
-    public List<CardInfoScript> PlayerFieldCard = new List<CardInfoScript>();
-    public List<CardInfoScript> EnemyFieldCard = new List<CardInfoScript>();
-
-    private Game currentGame;
     private int turn, turnTime = 30;
-
-    [HideInInspector] public int playerMana = 10, enemyMana = 10;
 
     private void Awake()
     {
@@ -70,44 +59,27 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         turn = 0;
-        currentGame = new Game();
 
-        ShowMana();
-        GiveHandCard(currentGame.EnemyDeck, enemy);
-        GiveHandCard(currentGame.PlayerDeck, player);
+        PlayerHP = EnemyHP = 30;
+
+        ShowHP();
 
         StartCoroutine(TurnFunc());
     }
 
-    private void GiveHandCard(List<Card> deck, Transform hand)
+    public void ChangeTurn()
     {
-        for (int i = 0; i < 4; i++)
+        StopAllCoroutines();
+        turn++;
+        endTurnButton.interactable = isPlayerTurn;
+
+        if (isPlayerTurn)
         {
-            GiveCardToHand(deck, hand);
+            CardManager.cardManager.GiveNewCards();
+            ManaManager.manager.AddMana();
+            ManaManager.manager.ShowMana();
         }
-    }
-
-    private void GiveCardToHand(List<Card> deck, Transform hand)
-    {
-        if (deck.Count == 0) return;
-
-        Card card = deck[0];
-        GameObject curentCard = Instantiate(cardPrefab, hand, false);
-
-        if (hand == enemy)
-        {
-            curentCard.GetComponent<CardInfoScript>().HideCardInfo(card);
-            curentCard.gameObject.transform.Rotate(new Vector3(0, 0, 180));
-            EnemyHandCard.Add(curentCard.GetComponent<CardInfoScript>());
-        }
-        else
-        {
-            curentCard.GetComponent<CardInfoScript>().ShowCardInfo(card, true);
-            PlayerHandCard.Add(curentCard.GetComponent<CardInfoScript>());
-            curentCard.GetComponent<AttacedCard>().enabled = false;
-        }
-
-        deck.RemoveAt(0);
+        StartCoroutine(TurnFunc());
     }
 
     private IEnumerator TurnFunc()
@@ -115,15 +87,20 @@ public class GameManager : MonoBehaviour
         turnTime = 30;
         turnTimeText.text = turnTime.ToString();
 
-        foreach (var card in PlayerFieldCard)
+        foreach (var card in CardManager.cardManager.PlayerFieldCard)
             card.HighLightCardDisable();
 
         if (isPlayerTurn)
         {
-            foreach (var card in PlayerFieldCard)
+            foreach (var card in CardManager.cardManager.PlayerFieldCard)
             {
                 card.SelfCard.ChangeAttackState(true);
                 card.HighLightCardEnable();
+                if (card.SelfCard.cardType == CardType.Build)
+                {
+                    card.SelfCard.ChangeAttackState(false);
+                    card.HighLightCardDisable();
+                }
             }
 
             while (turnTime-- > 0)
@@ -134,9 +111,14 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            foreach (var card in EnemyFieldCard)
+            foreach (var card in CardManager.cardManager.EnemyFieldCard)
             {
                 card.SelfCard.ChangeAttackState(true);
+                if (card.SelfCard.cardType == CardType.Build)
+                {
+                    card.SelfCard.ChangeAttackState(false);
+                    card.HighLightCardDisable();
+                }
             }
 
             while (turnTime-- > 27)
@@ -145,9 +127,9 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(1);
             }
 
-            if (EnemyHandCard.Count > 0)
+            if (CardManager.cardManager.EnemyHandCard.Count > 0)
             {
-                EnemyTurn(EnemyHandCard);
+                EnemyTurn(CardManager.cardManager.EnemyHandCard);
                 yield return new WaitForSeconds(1);
             }
         }
@@ -160,96 +142,123 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            if (EnemyFieldCard.Count > 5 && enemyMana == 0) return;
+            if (CardManager.cardManager.EnemyFieldCard.Count >= 5 && ManaManager.manager.enemyMana == 0) return;
 
-            List<CardInfoScript> cardList = cards.FindAll(x => enemyMana >= x.SelfCard.Manacost);
+            List<CardInfoScript> cardList = cards.FindAll(x => ManaManager.manager.enemyMana >= x.SelfCard.Manacost);
             if (cardList.Count == 0) break;
 
-            ReduceMana(false, cardList[0].SelfCard.Manacost);
+            ManaManager.manager.ReduceMana(false, cardList[0].SelfCard.Manacost);
 
             cardList[0].ShowCardInfo(cardList[0].SelfCard, false);
-            cardList[0].transform.SetParent(enemyField);
-            cardList[0].transform.Rotate(new Vector3(0, 0, 180));
-            EnemyFieldCard.Add(cardList[0]);
-            EnemyHandCard.Remove(cardList[0]);
+            cardList[0].DeleteManaCost();
+            cardList[0].transform.SetParent(CardManager.cardManager.enemyField);
+            cardList[0].transform.localPosition += new Vector3(0, 0, -10);
+            cardList[0].transform.Rotate(new Vector3(0, 180, 180));
+            CardManager.cardManager.EnemyFieldCard.Add(cardList[0]);
+            CardManager.cardManager.EnemyHandCard.Remove(cardList[0]);
         }
 
-        foreach (var active in EnemyFieldCard.FindAll(x => x.SelfCard.CanAttack))
+        foreach (var active in CardManager.cardManager.EnemyFieldCard.FindAll(x => x.SelfCard.CanAttack))
         {
-            if (PlayerFieldCard.Count == 0) { return; }
+            if (Random.Range(0, 2) == 0 && CardManager.cardManager.PlayerFieldCard.Count > 0)
+            {
+                switch (AttackEnemy(active))
+                {
+                    case true:
+                        var enemy = CardManager.cardManager.PlayerFieldCard[Random.Range(0, CardManager.cardManager.PlayerFieldCard.Count)];
 
-            var enemy = PlayerFieldCard[Random.Range(0, PlayerFieldCard.Count)];
-            enemy.ShowDamage(Color.red);
-            active.ShowDamage(Color.blue);
+                        if (enemy != null) enemy.ShowDamage(Color.red);
+                        if (active != null) active.ShowDamage(Color.blue);
 
-            active.SelfCard.ChangeAttackState(false);
-            CardsFight(enemy, active);
+                        CardManager.cardManager.CardsFight(enemy, active);
+                        break;
+
+                    case false:
+                        if (EnemyHP < 30) HealHero(active, true);
+                        else
+                        {
+                            var cardToHeal = CardManager.cardManager.EnemyFieldCard.Find(x => x.SelfCard.Defense < x.SelfCard.maxDefense
+                            && x.SelfCard.cardType != CardType.Build && x.SelfCard.cardType != CardType.AttackBuild);
+                            CardManager.cardManager.CardsHeal(active, cardToHeal);
+                            active.ShowDamage(Color.blue);
+                            cardToHeal.ShowDamage(Color.green);
+                        }
+                        break;
+                }
+
+                active.SelfCard.ChangeAttackState(false);
+            }
+            else
+            {
+                active.ShowDamage(Color.blue);
+                active.SelfCard.ChangeAttackState(false);
+                DamageHero(active, false);
+            }
         }
     }
 
-    public void ChangeTurn()
+    private bool AttackEnemy(CardInfoScript active)
     {
-        StopAllCoroutines();
-        turn++;
-        endTurnButton.interactable = isPlayerTurn;
-
-        if (isPlayerTurn)
+        if (active.SelfCard.cardType == CardType.Heal)
         {
-            GiveNewCards();
-            playerMana += 10;
-            enemyMana += 10;
-            ShowMana();
+            foreach (var enemyCards in CardManager.cardManager.EnemyFieldCard)
+            {
+                if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense) return false;
+            }
+            if (EnemyHP < 30) return false;
         }
-        StartCoroutine(TurnFunc());
+        return true;
     }
 
-    public void ReduceMana(bool isPlayer, int manacost)
+    public void DamageHero(CardInfoScript card, bool isEnemyAttacked)
     {
-        switch (isPlayer)
+        if (CardManager.cardManager.CheckIfBuildCard(isEnemyAttacked))
         {
-            case true:
-                playerMana = Mathf.Clamp(playerMana - manacost, 0, int.MaxValue);
-                break;
-
-            case false:
-                enemyMana = Mathf.Clamp(enemyMana - manacost, 0, int.MaxValue);
-                break;
+            card.ShowDamage(Color.blue);
+            CardManager.cardManager.tempBuild.ShowDamage(Color.red);
+            CardManager.cardManager.CardsFight(card, CardManager.cardManager.tempBuild);
         }
-        ShowMana();
+        else
+        {
+            if (isEnemyAttacked) EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
+            else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+        }
+
+        card.HighLightCardDisable();
+        ShowHP();
+        CheckForResult();
     }
 
-    private void ShowMana()
+    public void HealHero(CardInfoScript healCard, bool isEnemyHeal)
     {
-        playerManaText.text = playerMana.ToString();
-        enemyManaText.text = enemyMana.ToString();
+        if (isEnemyHeal) EnemyHP = Mathf.Clamp(EnemyHP + healCard.SelfCard.Heal, 0, 30);
+        else PlayerHP = Mathf.Clamp(PlayerHP + healCard.SelfCard.Heal, 0, 30);
+
+        healCard.HighLightCardDisable();
+        ShowHP();
     }
 
-    private void GiveNewCards()
+    private void ShowHP()
     {
-        GiveCardToHand(currentGame.EnemyDeck, enemy);
-        GiveCardToHand(currentGame.PlayerDeck, player);
+        playerHPText.text = PlayerHP.ToString();
+        enemyHPText.text = EnemyHP.ToString();
     }
 
-    public void CardsFight(CardInfoScript playerCard, CardInfoScript enemyCard)
+    private void CheckForResult()
     {
-        playerCard.SelfCard.GetDamage(enemyCard.SelfCard.Attack);
-        enemyCard.SelfCard.GetDamage(playerCard.SelfCard.Attack);
-
-        if (!playerCard.SelfCard.IsAlive) { DestroyCard(playerCard); }
-        else { playerCard.RefreshData(); }
-
-        if (!enemyCard.SelfCard.IsAlive) { DestroyCard(enemyCard); }
-        else { enemyCard.RefreshData(); }
-    }
-
-    private void DestroyCard(CardInfoScript card)
-    {
-        card.GetComponent<CardMovementScript>().OnEndDrag(null);
-
-        if (EnemyFieldCard.Exists(x => x == card)) { EnemyFieldCard.Remove(card); }
-
-        if (PlayerFieldCard.Exists(x => x == card)) { PlayerFieldCard.Remove(card); }
-
-        Destroy(card.gameObject);
+        if (EnemyHP == 0)
+        {
+            StopAllCoroutines();
+            resultsPanel.SetActive(true);
+            resultsText.text = "Победа";
+            resultsText.color = Color.green;
+        }
+        else if (PlayerHP == 0)
+        {
+            StopAllCoroutines();
+            resultsPanel.SetActive(true);
+            resultsText.text = "Поражение";
+            resultsText.color = Color.red;
+        }
     }
 }

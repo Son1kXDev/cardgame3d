@@ -10,17 +10,23 @@ public class CardInfoScript : MonoBehaviour
 
     public bool isPlayer;
 
+    public GameObject CardModel;
+
     [SerializeField] private Image logo;
-    [SerializeField] private Image hiden;
-    [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
-    [SerializeField] private MeshRenderer cardMaterial;
+    [SerializeField] private GameObject hiden;
+    [SerializeField] private TextMeshProUGUI lable, discription, attack, defence, manacost;
+    [SerializeField] private MeshRenderer currentCardMaterial;
+    [SerializeField] private List<Material> cardMaterials;
 
     public void HideCardInfo(Card card)
     {
         SelfCard = card;
-        hiden.enabled = true;
+        hiden.SetActive(true);
         isPlayer = false;
         manacost.text = "";
+        attack.text = "";
+        defence.text = "";
+        currentCardMaterial.material = cardMaterials[1];
     }
 
     public void ShowCardInfo(Card card, bool IsPlayer)
@@ -28,18 +34,34 @@ public class CardInfoScript : MonoBehaviour
         isPlayer = IsPlayer;
 
         SelfCard = card;
-        logo.sprite = card.Logo;
+        switch (IsPlayer)
+        {
+            case true:
+                logo.sprite = Resources.Load<Sprite>(card.logoPlayer);
+                currentCardMaterial.material = cardMaterials[0];
+                break;
+
+            case false:
+                logo.sprite = Resources.Load<Sprite>(card.logoEnemy);
+                break;
+        }
         logo.preserveAspect = true;
         lable.text = card.Name;
+        discription.text = card.Discription;
+        manacost.text = SelfCard.Manacost.ToString();
         RefreshData();
-        hiden.enabled = false;
+        hiden.SetActive(false);
+    }
+
+    public void DeleteManaCost()
+    {
+        manacost.text = "";
     }
 
     public void RefreshData()
     {
         attack.text = SelfCard.Attack.ToString();
         defence.text = SelfCard.Defense.ToString();
-        manacost.text = SelfCard.Manacost.ToString();
     }
 
     public void ShowDamage(Color color)
@@ -49,14 +71,14 @@ public class CardInfoScript : MonoBehaviour
 
     private IEnumerator visualizeDamage(Color color)
     {
-        cardMaterial.material.color = color;
-        yield return new WaitForSeconds(1);
-        cardMaterial.material.color = Color.white;
+        currentCardMaterial.material.color = color;
+        yield return new WaitForSeconds(0.5f);
+        currentCardMaterial.material.color = Color.white;
     }
 
     public void HighLightCardEnable()
-    { if (cardMaterial) cardMaterial.material.color = Color.green; }
+    { if (currentCardMaterial) currentCardMaterial.material.color = Color.green; }
 
     public void HighLightCardDisable()
-    { if (cardMaterial) cardMaterial.material.color = Color.white; }
+    { if (currentCardMaterial) currentCardMaterial.material.color = Color.white; }
 }

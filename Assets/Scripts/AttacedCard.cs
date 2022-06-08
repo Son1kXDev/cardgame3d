@@ -11,13 +11,13 @@ public class AttacedCard : MonoBehaviour, IDropHandler
 
         CardInfoScript card = eventData.pointerDrag.GetComponent<CardInfoScript>();
 
-        if (card && card.SelfCard.CanAttack && transform.parent == GameManager.manager.enemyField)
+        if (card && card.SelfCard.CanAttack && transform.parent == CardManager.cardManager.enemyField)
         {
             card.SelfCard.ChangeAttackState(false);
 
             if (card.isPlayer) card.HighLightCardDisable();
 
-            GameManager.manager.CardsFight(card, GetComponent<CardInfoScript>());
+            CardManager.cardManager.CardsFight(card, GetComponent<CardInfoScript>());
         }
     }
 }
