@@ -15,7 +15,8 @@ public class CardInfoScript : MonoBehaviour
     [SerializeField] private Image logo;
     [SerializeField] private GameObject hiden;
     [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
-    [SerializeField] private MeshRenderer cardMaterial;
+    [SerializeField] private MeshRenderer currentCardMaterial;
+    [SerializeField] private List<Material> cardMaterials;
 
     public void HideCardInfo(Card card)
     {
@@ -23,6 +24,9 @@ public class CardInfoScript : MonoBehaviour
         hiden.SetActive(true);
         isPlayer = false;
         manacost.text = "";
+        attack.text = "";
+        defence.text = "";
+        currentCardMaterial.material = cardMaterials[1];
     }
 
     public void ShowCardInfo(Card card, bool IsPlayer)
@@ -34,6 +38,7 @@ public class CardInfoScript : MonoBehaviour
         {
             case true:
                 logo.sprite = Resources.Load<Sprite>(card.logoPlayer);
+                currentCardMaterial.material = cardMaterials[0];
                 break;
 
             case false:
@@ -65,14 +70,14 @@ public class CardInfoScript : MonoBehaviour
 
     private IEnumerator visualizeDamage(Color color)
     {
-        cardMaterial.material.color = color;
+        currentCardMaterial.material.color = color;
         yield return new WaitForSeconds(0.5f);
-        cardMaterial.material.color = Color.white;
+        currentCardMaterial.material.color = Color.white;
     }
 
     public void HighLightCardEnable()
-    { if (cardMaterial) cardMaterial.material.color = Color.green; }
+    { if (currentCardMaterial) currentCardMaterial.material.color = Color.green; }
 
     public void HighLightCardDisable()
-    { if (cardMaterial) cardMaterial.material.color = Color.white; }
+    { if (currentCardMaterial) currentCardMaterial.material.color = Color.white; }
 }
