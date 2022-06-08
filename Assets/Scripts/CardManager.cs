@@ -129,7 +129,6 @@ public class CardManager : MonoBehaviour
             PlayerHandCard.Add(curentCard.GetComponent<CardInfoScript>());
             curentCard.GetComponent<AttacedCard>().enabled = false;
         }
-
         deck.RemoveAt(0);
     }
 

@@ -46,12 +46,9 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI turnTimeText;
-    [SerializeField] private TextMeshProUGUI playerManaText, enemyManaText;
     [SerializeField] private Button endTurnButton;
 
     private int turn, turnTime = 30;
-
-    [HideInInspector] public int playerMana = 10, enemyMana = 10;
 
     private void Awake()
     {
@@ -65,7 +62,6 @@ public class GameManager : MonoBehaviour
 
         PlayerHP = EnemyHP = 30;
 
-        ShowMana();
         ShowHP();
 
         StartCoroutine(TurnFunc());
@@ -80,9 +76,8 @@ public class GameManager : MonoBehaviour
         if (isPlayerTurn)
         {
             CardManager.cardManager.GiveNewCards();
-            playerMana += 10;
-            enemyMana += 10;
-            ShowMana();
+            ManaManager.manager.AddMana();
+            ManaManager.manager.ShowMana();
         }
         StartCoroutine(TurnFunc());
     }
@@ -157,14 +152,15 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            if (CardManager.cardManager.EnemyFieldCard.Count >= 5 && enemyMana == 0) return;
+            if (CardManager.cardManager.EnemyFieldCard.Count >= 5 && ManaManager.manager.enemyMana == 0) return;
 
-            List<CardInfoScript> cardList = cards.FindAll(x => enemyMana >= x.SelfCard.Manacost);
+            List<CardInfoScript> cardList = cards.FindAll(x => ManaManager.manager.enemyMana >= x.SelfCard.Manacost);
             if (cardList.Count == 0) break;
 
-            ReduceMana(false, cardList[0].SelfCard.Manacost);
+            ManaManager.manager.ReduceMana(false, cardList[0].SelfCard.Manacost);
 
             cardList[0].ShowCardInfo(cardList[0].SelfCard, false);
+            cardList[0].DeleteManaCost();
             cardList[0].transform.SetParent(CardManager.cardManager.enemyField);
             cardList[0].transform.Rotate(new Vector3(0, 0, 180));
             CardManager.cardManager.EnemyFieldCard.Add(cardList[0]);
@@ -178,7 +174,6 @@ public class GameManager : MonoBehaviour
                 bool attackEnemy = false;
                 foreach (var enemyCards in CardManager.cardManager.EnemyFieldCard)
                 {
-                    print("Searching for card to heal");
                     if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense) { attackEnemy = false; break; }
                     else attackEnemy = true;
                 }
@@ -206,34 +201,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Attaced hero");
-
                 active.ShowDamage(Color.blue);
                 active.SelfCard.ChangeAttackState(false);
                 DamageHero(active, false);
             }
         }
-    }
-
-    public void ReduceMana(bool isPlayer, int manacost)
-    {
-        switch (isPlayer)
-        {
-            case true:
-                playerMana = Mathf.Clamp(playerMana - manacost, 0, int.MaxValue);
-                break;
-
-            case false:
-                enemyMana = Mathf.Clamp(enemyMana - manacost, 0, int.MaxValue);
-                break;
-        }
-        ShowMana();
-    }
-
-    private void ShowMana()
-    {
-        playerManaText.text = playerMana.ToString();
-        enemyManaText.text = enemyMana.ToString();
     }
 
     public void DamageHero(CardInfoScript card, bool isEnemyAttacked)

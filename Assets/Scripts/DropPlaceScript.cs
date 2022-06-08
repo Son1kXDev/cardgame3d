@@ -22,12 +22,13 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler, IPointerEnterHandler
         CardMovementScript card = eventData.pointerDrag.GetComponent<CardMovementScript>();
 
         if (card && CardManager.cardManager.PlayerFieldCard.Count <= 5 && GameManager.manager.isPlayerTurn
-            && GameManager.manager.playerMana >= card.GetComponent<CardInfoScript>().SelfCard.Manacost)
+            && ManaManager.manager.playerMana >= card.GetComponent<CardInfoScript>().SelfCard.Manacost)
         {
             CardManager.cardManager.PlayerHandCard.Remove(card.GetComponent<CardInfoScript>());
             CardManager.cardManager.PlayerFieldCard.Add(card.GetComponent<CardInfoScript>());
-            if (card.defaultParent != transform) GameManager.manager.ReduceMana(true, card.GetComponent<CardInfoScript>().SelfCard.Manacost);
+            if (card.defaultParent != transform) ManaManager.manager.ReduceMana(true, card.GetComponent<CardInfoScript>().SelfCard.Manacost);
             card.defaultParent = transform;
+            card.GetComponent<CardInfoScript>().DeleteManaCost();
         }
     }
 

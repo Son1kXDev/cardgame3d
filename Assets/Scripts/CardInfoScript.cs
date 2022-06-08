@@ -42,15 +42,20 @@ public class CardInfoScript : MonoBehaviour
         }
         logo.preserveAspect = true;
         lable.text = card.Name;
+        manacost.text = SelfCard.Manacost.ToString();
         RefreshData();
         hiden.SetActive(false);
+    }
+
+    public void DeleteManaCost()
+    {
+        manacost.text = "";
     }
 
     public void RefreshData()
     {
         attack.text = SelfCard.Attack.ToString();
         defence.text = SelfCard.Defense.ToString();
-        manacost.text = SelfCard.Manacost.ToString();
     }
 
     public void ShowDamage(Color color)
