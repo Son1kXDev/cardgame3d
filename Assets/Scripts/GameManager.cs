@@ -94,12 +94,10 @@ public class GameManager : MonoBehaviour
         {
             foreach (var card in CardManager.cardManager.PlayerFieldCard)
             {
-                Debug.Log("set card to attack");
                 card.SelfCard.ChangeAttackState(true);
                 card.HighLightCardEnable();
                 if (card.SelfCard.cardType == CardType.Build)
                 {
-                    Debug.Log("disable build card");
                     card.SelfCard.ChangeAttackState(false);
                     card.HighLightCardDisable();
                 }
@@ -135,14 +133,6 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(1);
             }
         }
-        if (CardManager.cardManager.CardsToDestroy.Count > 0)
-        {
-            foreach (var card in CardManager.cardManager.CardsToDestroy)
-            {
-                CardManager.cardManager.DestroyCard(card);
-            }
-            CardManager.cardManager.CardsToDestroy.Clear();
-        }
         ChangeTurn();
     }
 
@@ -162,7 +152,8 @@ public class GameManager : MonoBehaviour
             cardList[0].ShowCardInfo(cardList[0].SelfCard, false);
             cardList[0].DeleteManaCost();
             cardList[0].transform.SetParent(CardManager.cardManager.enemyField);
-            cardList[0].transform.Rotate(new Vector3(0, 0, 180));
+            cardList[0].transform.localPosition += new Vector3(0, 0, -10);
+            cardList[0].transform.Rotate(new Vector3(0, 180, 180));
             CardManager.cardManager.EnemyFieldCard.Add(cardList[0]);
             CardManager.cardManager.EnemyHandCard.Remove(cardList[0]);
         }
@@ -171,29 +162,27 @@ public class GameManager : MonoBehaviour
         {
             if (Random.Range(0, 2) == 0 && CardManager.cardManager.PlayerFieldCard.Count > 0)
             {
-                bool attackEnemy = false;
-                foreach (var enemyCards in CardManager.cardManager.EnemyFieldCard)
-                {
-                    if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense) { attackEnemy = false; break; }
-                    else attackEnemy = true;
-                }
-                if (active.SelfCard.cardType != CardType.Heal) attackEnemy = true;
-                switch (attackEnemy)
+                switch (AttackEnemy(active))
                 {
                     case true:
                         var enemy = CardManager.cardManager.PlayerFieldCard[Random.Range(0, CardManager.cardManager.PlayerFieldCard.Count)];
 
-                        enemy.ShowDamage(Color.red);
-                        active.ShowDamage(Color.blue);
+                        if (enemy != null) enemy.ShowDamage(Color.red);
+                        if (active != null) active.ShowDamage(Color.blue);
 
                         CardManager.cardManager.CardsFight(enemy, active);
                         break;
 
                     case false:
-                        var cardToHeal = CardManager.cardManager.EnemyFieldCard.Find(x => x.SelfCard.Defense < x.SelfCard.maxDefense);
-                        CardManager.cardManager.CardsHeal(active, cardToHeal);
-                        active.ShowDamage(Color.blue);
-                        cardToHeal.ShowDamage(Color.green);
+                        if (EnemyHP < 30) HealHero(active, true);
+                        else
+                        {
+                            var cardToHeal = CardManager.cardManager.EnemyFieldCard.Find(x => x.SelfCard.Defense < x.SelfCard.maxDefense
+                            && x.SelfCard.cardType != CardType.Build && x.SelfCard.cardType != CardType.AttackBuild);
+                            CardManager.cardManager.CardsHeal(active, cardToHeal);
+                            active.ShowDamage(Color.blue);
+                            cardToHeal.ShowDamage(Color.green);
+                        }
                         break;
                 }
 
@@ -208,11 +197,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private bool AttackEnemy(CardInfoScript active)
+    {
+        if (active.SelfCard.cardType == CardType.Heal)
+        {
+            foreach (var enemyCards in CardManager.cardManager.EnemyFieldCard)
+            {
+                if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense) return false;
+            }
+            if (EnemyHP < 30) return false;
+        }
+        return true;
+    }
+
     public void DamageHero(CardInfoScript card, bool isEnemyAttacked)
     {
         if (CardManager.cardManager.CheckIfBuildCard(isEnemyAttacked))
         {
-            Debug.Log("Find build");
             card.ShowDamage(Color.blue);
             CardManager.cardManager.tempBuild.ShowDamage(Color.red);
             CardManager.cardManager.CardsFight(card, CardManager.cardManager.tempBuild);
@@ -223,22 +224,28 @@ public class GameManager : MonoBehaviour
             else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
         }
 
-        Debug.Log("End of attack");
         card.HighLightCardDisable();
         ShowHP();
         CheckForResult();
+    }
+
+    public void HealHero(CardInfoScript healCard, bool isEnemyHeal)
+    {
+        if (isEnemyHeal) EnemyHP = Mathf.Clamp(EnemyHP + healCard.SelfCard.Heal, 0, 30);
+        else PlayerHP = Mathf.Clamp(PlayerHP + healCard.SelfCard.Heal, 0, 30);
+
+        healCard.HighLightCardDisable();
+        ShowHP();
     }
 
     private void ShowHP()
     {
         playerHPText.text = PlayerHP.ToString();
         enemyHPText.text = EnemyHP.ToString();
-        Debug.Log("Show hp");
     }
 
     private void CheckForResult()
     {
-        Debug.Log("Checkforresult");
         if (EnemyHP == 0)
         {
             StopAllCoroutines();

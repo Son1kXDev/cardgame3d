@@ -14,7 +14,7 @@ public class CardInfoScript : MonoBehaviour
 
     [SerializeField] private Image logo;
     [SerializeField] private GameObject hiden;
-    [SerializeField] private TextMeshProUGUI lable, attack, defence, manacost;
+    [SerializeField] private TextMeshProUGUI lable, discription, attack, defence, manacost;
     [SerializeField] private MeshRenderer currentCardMaterial;
     [SerializeField] private List<Material> cardMaterials;
 
@@ -47,6 +47,7 @@ public class CardInfoScript : MonoBehaviour
         }
         logo.preserveAspect = true;
         lable.text = card.Name;
+        discription.text = card.Discription;
         manacost.text = SelfCard.Manacost.ToString();
         RefreshData();
         hiden.SetActive(false);

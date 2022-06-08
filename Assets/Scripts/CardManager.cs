@@ -10,6 +10,7 @@ public enum CardType
 public struct Card
 {
     public string Name;
+    public string Discription;
     public Sprite Logo;
     public string logoPlayer, logoEnemy;
     public int Attack, Heal, Defense, maxDefense, Manacost;
@@ -24,10 +25,11 @@ public struct Card
         }
     }
 
-    public Card(string name, string logoPathPlayer, string logoPathEnemy, int attack, int heal, int defense, int manacost, CardType type)
+    public Card(string name, string discription, string logoPathPlayer, string logoPathEnemy, int attack, int heal, int defense, int manacost, CardType type)
     {
         Name = name;
-        Logo = Resources.Load<Sprite>(""); //Resources.Load<Sprite>(logoPathPlayer);
+        Discription = discription;
+        Logo = Resources.Load<Sprite>("");
         logoPlayer = logoPathPlayer;
         logoEnemy = logoPathEnemy;
         Attack = attack;
@@ -79,13 +81,13 @@ public class CardManager : MonoBehaviour
         if (cardManager != null) Destroy(this);
         else cardManager = this;
 
-        CardManagerList.AllCards.Add(new Card("Лучник", "Sprite/Cards/archer_elf", "Sprite/Cards/archer_ork", 3, 0, 3, 2, CardType.Attack));
-        CardManagerList.AllCards.Add(new Card("Мечник", "Sprite/Cards/melee_elf", "Sprite/Cards/melee_ork", 5, 0, 5, 4, CardType.Attack));
-        CardManagerList.AllCards.Add(new Card("Танк", "Sprite/Cards/tank_elf", "Sprite/Cards/tank_ork", 7, 0, 15, 15, CardType.Attack));
-        CardManagerList.AllCards.Add(new Card("Целитель", "Sprite/Cards/heal_elf", "Sprite/Cards/heal_ork", 1, 5, 3, 5, CardType.Heal));
-        CardManagerList.AllCards.Add(new Card("Маг", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
-        CardManagerList.AllCards.Add(new Card("Катапульта", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
-        CardManagerList.AllCards.Add(new Card("Башня", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
+        CardManagerList.AllCards.Add(new Card("Лучник", "Метко стреляет", "Sprite/Cards/archer_elf", "Sprite/Cards/archer_ork", 3, 0, 3, 2, CardType.Attack));
+        CardManagerList.AllCards.Add(new Card("Мечник", "Хорошо убивает", "Sprite/Cards/melee_elf", "Sprite/Cards/melee_ork", 5, 0, 5, 4, CardType.Attack));
+        CardManagerList.AllCards.Add(new Card("Танк", "Сильный и мощный", "Sprite/Cards/tank_elf", "Sprite/Cards/tank_ork", 7, 0, 15, 15, CardType.Attack));
+        CardManagerList.AllCards.Add(new Card("Целитель", "Лечит", "Sprite/Cards/heal_elf", "Sprite/Cards/heal_ork", 1, 5, 3, 5, CardType.Heal));
+        CardManagerList.AllCards.Add(new Card("Маг", "Убивает и лечит", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
+        CardManagerList.AllCards.Add(new Card("Катапульта", "Мощно стреляет", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
+        CardManagerList.AllCards.Add(new Card("Башня", "Хорошо защищает", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
     }
 
     private void Start()
@@ -120,7 +122,7 @@ public class CardManager : MonoBehaviour
         if (hand == enemy)
         {
             curentCard.GetComponent<CardInfoScript>().HideCardInfo(card);
-            curentCard.gameObject.transform.Rotate(new Vector3(0, 0, 180));
+            curentCard.gameObject.transform.Rotate(new Vector3(0, -180, 180));
             EnemyHandCard.Add(curentCard.GetComponent<CardInfoScript>());
         }
         else
@@ -138,14 +140,12 @@ public class CardManager : MonoBehaviour
         healedCard.RefreshData();
     }
 
-    [HideInInspector] public List<CardInfoScript> CardsToDestroy = new List<CardInfoScript>();
-
     public void CardsFight(CardInfoScript playerCard, CardInfoScript enemyCard)
     {
         playerCard.SelfCard.GetDamage(enemyCard.SelfCard.Attack);
         enemyCard.SelfCard.GetDamage(playerCard.SelfCard.Attack);
 
-        if (!playerCard.SelfCard.IsAlive) { CardsToDestroy.Add(playerCard); playerCard.CardModel.SetActive(false); }
+        if (!playerCard.SelfCard.IsAlive) { CardManager.cardManager.DestroyCard(playerCard); }
         else { playerCard.RefreshData(); }
 
         if (!enemyCard.SelfCard.IsAlive) { CardManager.cardManager.DestroyCard(enemyCard); }
@@ -173,9 +173,9 @@ public class CardManager : MonoBehaviour
             case true:
                 foreach (var item in EnemyFieldCard)
                 {
-                    if (item.GetComponent<CardInfoScript>() != null && item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    if (item != null && item.GetComponent<CardInfoScript>() != null && item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
                     {
-                        tempBuild = item;
+                        if (item != null) tempBuild = item;
                         return true;
                     }
                 }
@@ -184,9 +184,9 @@ public class CardManager : MonoBehaviour
             case false:
                 foreach (var item in PlayerFieldCard)
                 {
-                    if (item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
+                    if (item != null && item.GetComponent<CardInfoScript>().SelfCard.cardType == CardType.Build)
                     {
-                        tempBuild = item;
+                        if (item != null) tempBuild = item;
                         return true;
                     }
                 }
