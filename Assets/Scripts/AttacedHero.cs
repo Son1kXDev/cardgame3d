@@ -18,6 +18,8 @@ public class AttacedHero : MonoBehaviour, IDropHandler
 
         if (card && card.SelfCard.CanAttack && Type == HeroType.ENEMY)
         {
+            card.AttackAnimation(transform.position);
+
             card.SelfCard.CanAttack = false;
             GameManager.manager.DamageHero(card, true);
         }

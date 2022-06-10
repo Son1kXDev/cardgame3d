@@ -12,16 +12,14 @@ public class HealHero : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        print("On Drop detected");
         if (!GameManager.manager.isPlayerTurn) return;
-
-        print("is Player turn");
 
         CardInfoScript card = eventData.pointerDrag.GetComponent<CardInfoScript>();
 
         if (card && card.SelfCard.CanAttack && Type == HeroType.PLAYER && card.SelfCard.cardType == CardType.Heal)
         {
-            print("Card correct");
+            card.AttackAnimation(transform.position);
+
             card.SelfCard.CanAttack = false;
             GameManager.manager.HealHero(card, false);
         }

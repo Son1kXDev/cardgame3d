@@ -17,6 +17,7 @@ public class HealedCard : MonoBehaviour, IDropHandler
             && GetComponent<CardInfoScript>().SelfCard.cardType != CardType.Build
             && GetComponent<CardInfoScript>().SelfCard.cardType != CardType.AttackBuild)
         {
+            card.AttackAnimation(transform.position);
             card.SelfCard.ChangeAttackState(false);
             if (card.isPlayer) card.HighLightCardDisable();
             CardManager.cardManager.CardsHeal(card, GetComponent<CardInfoScript>());

@@ -12,6 +12,9 @@ public class CardInfoScript : MonoBehaviour
 
     public GameObject CardModel;
 
+    [SerializeField] private Animator cardAnimator;
+    [SerializeField] private string attackAnimation;
+
     [SerializeField] private Image logo;
     [SerializeField] private GameObject hiden;
     [SerializeField] private TextMeshProUGUI lable, discription, attack, defence, manacost;
@@ -53,10 +56,7 @@ public class CardInfoScript : MonoBehaviour
         hiden.SetActive(false);
     }
 
-    public void DeleteManaCost()
-    {
-        manacost.text = "";
-    }
+    public void DeleteManaCost() => manacost.text = "";
 
     public void RefreshData()
     {
@@ -64,16 +64,11 @@ public class CardInfoScript : MonoBehaviour
         defence.text = SelfCard.Defense.ToString();
     }
 
-    public void ShowDamage(Color color)
+    public void AttackAnimation(Vector3 enemyTransform)
     {
-        StartCoroutine(visualizeDamage(color));
-    }
-
-    private IEnumerator visualizeDamage(Color color)
-    {
-        currentCardMaterial.material.color = color;
-        yield return new WaitForSeconds(0.5f);
-        currentCardMaterial.material.color = Color.white;
+        transform.position = enemyTransform;
+        transform.position += new Vector3(0, 5, 0);
+        cardAnimator.Play(attackAnimation);
     }
 
     public void HighLightCardEnable()
