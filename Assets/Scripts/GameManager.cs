@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        Time.timeScale = 1;
         turn = 0;
 
         PlayerHP = EnemyHP = 30;
@@ -281,6 +282,7 @@ public class GameManager : MonoBehaviour
             resultsPanel.SetActive(true);
             resultsText.text = "Победа";
             resultsText.color = Color.green;
+            Time.timeScale = 0;
         }
         else if (PlayerHP == 0)
         {
@@ -288,6 +290,7 @@ public class GameManager : MonoBehaviour
             resultsPanel.SetActive(true);
             resultsText.text = "Поражение";
             resultsText.color = Color.red;
+            Time.timeScale = 0;
         }
     }
 }

@@ -84,10 +84,10 @@ public class CardManager : MonoBehaviour
         CardManagerList.AllCards.Add(new Card("Лучник", "Метко стреляет", "Sprite/Cards/archer_elf", "Sprite/Cards/archer_ork", 3, 0, 3, 2, CardType.Attack));
         CardManagerList.AllCards.Add(new Card("Мечник", "Хорошо убивает", "Sprite/Cards/melee_elf", "Sprite/Cards/melee_ork", 5, 0, 5, 4, CardType.Attack));
         CardManagerList.AllCards.Add(new Card("Танк", "Сильный и мощный", "Sprite/Cards/tank_elf", "Sprite/Cards/tank_ork", 7, 0, 15, 15, CardType.Attack));
-        CardManagerList.AllCards.Add(new Card("Целитель", "Лечит", "Sprite/Cards/heal_elf", "Sprite/Cards/heal_ork", 1, 5, 3, 5, CardType.Heal));
-        CardManagerList.AllCards.Add(new Card("Маг", "Убивает и лечит", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
-        CardManagerList.AllCards.Add(new Card("Катапульта", "Мощно стреляет", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
-        CardManagerList.AllCards.Add(new Card("Башня", "Хорошо защищает", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
+        CardManagerList.AllCards.Add(new Card("Целитель", "Лечит +5HP", "Sprite/Cards/heal_elf", "Sprite/Cards/heal_ork", 1, 5, 3, 5, CardType.Heal));
+        CardManagerList.AllCards.Add(new Card("Маг", "Лечит +2HP", "Sprite/Cards/wizard_elf", "Sprite/Cards/wizard_ork", 10, 2, 3, 10, CardType.Heal));
+        CardManagerList.AllCards.Add(new Card("Катапульта", "Стреляющее здание", "Sprite/Cards/catapult_elf", "Sprite/Cards/catapult_ork", 10, 0, 5, 10, CardType.AttackBuild));
+        CardManagerList.AllCards.Add(new Card("Башня", "Защищает главного героя", "Sprite/Cards/wall_elf", "Sprite/Cards/wall_ork", 0, 0, 20, 5, CardType.Build));
     }
 
     private void Start()
