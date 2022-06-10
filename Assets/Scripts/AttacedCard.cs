@@ -13,6 +13,8 @@ public class AttacedCard : MonoBehaviour, IDropHandler
 
         if (card && card.SelfCard.CanAttack && transform.parent == CardManager.cardManager.enemyField)
         {
+            card.AttackAnimation(transform.position);
+
             card.SelfCard.ChangeAttackState(false);
 
             if (card.isPlayer) card.HighLightCardDisable();

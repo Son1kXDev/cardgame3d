@@ -694,6 +694,8 @@ MonoBehaviour:
   defaultTempCardParent: {fileID: 0}
   isDraggable: 0
   canvas: {fileID: 0}
+  cardAnimator: {fileID: 2490741317141575518}
+  attackAnimation: {fileID: 0}
 --- !u!225 &6616682576267269878
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -720,6 +722,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPlayer: 0
   CardModel: {fileID: 6488119832283044439}
+  cardAnimator: {fileID: 2490741317141575518}
+  attackAnimation: AttackState
   logo: {fileID: 8875167423269077256}
   hiden: {fileID: 2645027385049728858}
   lable: {fileID: 6569664234770749875}
@@ -1154,11 +1158,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1189,3 +1193,34 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0bda836397fd0694cbc1550d0443389f, type: 3}
   m_PrefabInstance: {fileID: 6254100535958890246}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &2490741317141575518
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6488119832283044439}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 65bab9ba9a75aaf42af20e872241f0a1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &3041561828555791556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6488119832283044439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82e0c20b6af2e3442a635e461608996d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

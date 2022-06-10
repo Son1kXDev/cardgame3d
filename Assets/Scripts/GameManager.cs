@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    [SerializeField] private Transform playerHero, enemyHero;
+    [SerializeField] private Transform clearParent;
+
     [Header("Жизни")]
     [SerializeField] private int PlayerHP;
     [SerializeField] private int EnemyHP;
@@ -61,6 +64,8 @@ public class GameManager : MonoBehaviour
         turn = 0;
 
         PlayerHP = EnemyHP = 30;
+
+        clearParent = GameObject.FindGameObjectWithTag("clearParent").transform;
 
         ShowHP();
 
@@ -136,6 +141,23 @@ public class GameManager : MonoBehaviour
         ChangeTurn();
     }
 
+    private IEnumerator EnemyTurnAnimation(CardInfoScript active, Transform enemy)
+    {
+        Transform cash = active.transform.parent;
+
+        print("Set default parent");
+
+        active.transform.SetParent(clearParent);
+        active.AttackAnimation(enemy.position);
+
+        yield return new WaitForSeconds(1f);
+
+        print("Set cash parent");
+
+        active.transform.SetParent(cash);
+        active.transform.position -= new Vector3(0, 6, 0);
+    }
+
     private void EnemyTurn(List<CardInfoScript> cards)
     {
         int count = Random.Range(1, cards.Count);
@@ -167,8 +189,7 @@ public class GameManager : MonoBehaviour
                     case true:
                         var enemy = CardManager.cardManager.PlayerFieldCard[Random.Range(0, CardManager.cardManager.PlayerFieldCard.Count)];
 
-                        if (enemy != null) enemy.ShowDamage(Color.red);
-                        if (active != null) active.ShowDamage(Color.blue);
+                        StartCoroutine(EnemyTurnAnimation(active, enemy.transform));
 
                         CardManager.cardManager.CardsFight(enemy, active);
                         break;
@@ -180,8 +201,7 @@ public class GameManager : MonoBehaviour
                             var cardToHeal = CardManager.cardManager.EnemyFieldCard.Find(x => x.SelfCard.Defense < x.SelfCard.maxDefense
                             && x.SelfCard.cardType != CardType.Build && x.SelfCard.cardType != CardType.AttackBuild);
                             CardManager.cardManager.CardsHeal(active, cardToHeal);
-                            active.ShowDamage(Color.blue);
-                            cardToHeal.ShowDamage(Color.green);
+                            StartCoroutine(EnemyTurnAnimation(active, cardToHeal.transform));
                         }
                         break;
                 }
@@ -190,7 +210,6 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                active.ShowDamage(Color.blue);
                 active.SelfCard.ChangeAttackState(false);
                 DamageHero(active, false);
             }
@@ -203,7 +222,10 @@ public class GameManager : MonoBehaviour
         {
             foreach (var enemyCards in CardManager.cardManager.EnemyFieldCard)
             {
-                if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense) return false;
+                if (enemyCards.SelfCard.Defense < enemyCards.SelfCard.maxDefense
+                    && enemyCards.SelfCard.cardType != CardType.Build
+                    && enemyCards.SelfCard.cardType != CardType.AttackBuild)
+                    return false;
             }
             if (EnemyHP < 30) return false;
         }
@@ -214,14 +236,17 @@ public class GameManager : MonoBehaviour
     {
         if (CardManager.cardManager.CheckIfBuildCard(isEnemyAttacked))
         {
-            card.ShowDamage(Color.blue);
-            CardManager.cardManager.tempBuild.ShowDamage(Color.red);
+            StartCoroutine(EnemyTurnAnimation(card, CardManager.cardManager.tempBuild.transform));
             CardManager.cardManager.CardsFight(card, CardManager.cardManager.tempBuild);
         }
         else
         {
             if (isEnemyAttacked) EnemyHP = Mathf.Clamp(EnemyHP - card.SelfCard.Attack, 0, int.MaxValue);
-            else PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+            else
+            {
+                StartCoroutine(EnemyTurnAnimation(card, playerHero));
+                PlayerHP = Mathf.Clamp(PlayerHP - card.SelfCard.Attack, 0, int.MaxValue);
+            }
         }
 
         card.HighLightCardDisable();
@@ -231,7 +256,11 @@ public class GameManager : MonoBehaviour
 
     public void HealHero(CardInfoScript healCard, bool isEnemyHeal)
     {
-        if (isEnemyHeal) EnemyHP = Mathf.Clamp(EnemyHP + healCard.SelfCard.Heal, 0, 30);
+        if (isEnemyHeal)
+        {
+            EnemyHP = Mathf.Clamp(EnemyHP + healCard.SelfCard.Heal, 0, 30);
+            StartCoroutine(EnemyTurnAnimation(healCard, enemyHero));
+        }
         else PlayerHP = Mathf.Clamp(PlayerHP + healCard.SelfCard.Heal, 0, 30);
 
         healCard.HighLightCardDisable();
@@ -248,14 +277,14 @@ public class GameManager : MonoBehaviour
     {
         if (EnemyHP == 0)
         {
-            StopAllCoroutines();
+            StopCoroutine(TurnFunc());
             resultsPanel.SetActive(true);
             resultsText.text = "Победа";
             resultsText.color = Color.green;
         }
         else if (PlayerHP == 0)
         {
-            StopAllCoroutines();
+            StopCoroutine(TurnFunc());
             resultsPanel.SetActive(true);
             resultsText.text = "Поражение";
             resultsText.color = Color.red;

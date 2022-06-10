@@ -145,6 +145,12 @@ public class CardManager : MonoBehaviour
         playerCard.SelfCard.GetDamage(enemyCard.SelfCard.Attack);
         enemyCard.SelfCard.GetDamage(playerCard.SelfCard.Attack);
 
+        StartCoroutine(WaitCardFight(playerCard, enemyCard));
+    }
+
+    private IEnumerator WaitCardFight(CardInfoScript playerCard, CardInfoScript enemyCard)
+    {
+        yield return new WaitForSeconds(1);
         if (!playerCard.SelfCard.IsAlive) { CardManager.cardManager.DestroyCard(playerCard); }
         else { playerCard.RefreshData(); }
 

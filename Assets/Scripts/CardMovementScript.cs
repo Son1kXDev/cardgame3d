@@ -9,6 +9,8 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
     public bool isDraggable;
 
     [SerializeField] private Canvas canvas;
+    [SerializeField] private Animator cardAnimator;
+    [SerializeField] private Animation attackAnimation;
 
     private GameObject tempCard;
     private RectTransform rectTransform;
@@ -53,15 +55,25 @@ public class CardMovementScript : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         if (!isDraggable) return;
 
-        transform.SetParent(defaultParent);
-        GetComponent<CanvasGroup>().blocksRaycasts = true;
+        StartCoroutine(onEndDragCourotine());
+    }
 
-        transform.SetSiblingIndex(tempCard.transform.GetSiblingIndex());
-
-        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
+    private IEnumerator onEndDragCourotine()
+    {
+        yield return new WaitForSeconds(0.1f);
 
         tempCard.transform.SetParent(canvas.transform);
         tempCard.transform.localPosition = new Vector3(2500, 0);
+
+        if (AnimationData.isAttacking)
+        {
+            yield return new WaitForSeconds(1);
+        }
+
+        transform.SetParent(defaultParent);
+        GetComponent<CanvasGroup>().blocksRaycasts = true;
+        transform.SetSiblingIndex(tempCard.transform.GetSiblingIndex());
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
     }
 
     private void CheckPossition()
